@@ -1,5 +1,5 @@
 use std::f64::consts::FRAC_1_SQRT_2;
-use crate::qbit::qbit::{Qubit, Qubit8};
+use crate::qbit::qbit::{Qubit};
 
 #[derive(Debug)]
 pub struct Logic;

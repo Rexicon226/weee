@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 macro_rules! qubit_type {
     ($dim:expr) => {
         #[derive(Debug)]
@@ -7,9 +8,9 @@ macro_rules! qubit_type {
 
         impl Qubit {
             pub fn new() -> Self {
-                Qubit {
-                    state: [1.0, 0.0],
-                }
+                let mut state = [0.0; $dim];
+                state[0] = 1.0;
+                Qubit { state }
             }
 
             pub fn apply_matrix(&mut self, matrix: &[[f64; $dim]; $dim]) {
@@ -22,32 +23,6 @@ macro_rules! qubit_type {
                     new_state[i] = sum;
                 }
                 self.state = new_state;
-            }
-
-            pub fn split(&self) -> (Self, Self) {
-                let mut q0 = Qubit {
-                    state: [0.0; $dim],
-                };
-                let mut q1 = Qubit {
-                    state: [0.0; $dim],
-                };
-                for i in 0..$dim/2 {
-                    q0.state[i] = self.state[i];
-                    q1.state[i] = self.state[i + $dim/2];
-                }
-                (q0, q1)
-            }
-
-            pub fn tensor_product(&self, other: &Qubit) -> Qubit {
-                let mut result = Qubit {
-                    state: [0.0; $dim * $dim],
-                };
-                for i in 0..$dim {
-                    for j in 0..$dim {
-                        result.state[i * $dim + j] = self.state[i] * other.state[j];
-                    }
-                }
-                result
             }
 
             pub fn probability(&self) -> f64 {
@@ -64,4 +39,30 @@ macro_rules! qubit_type {
             }
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_qubit() {
+        qubit_type!(2);
+        let q1 = Qubit::new();
+        println!("{:?}", q1);
+        assert_eq!(q1.state, [1.0, 0.0]);
+    }
+
+    #[test]
+    fn test_apply_matrix_qubit4() {
+        qubit_type!(4);
+        let mut q = Qubit::new();
+        let matrix = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ];
+        q.apply_matrix(&matrix);
+        assert_eq!(q.state, [1.0, 0.0, 0.0, 0.0]);
+    }
+
 }

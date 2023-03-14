@@ -1,7 +1,7 @@
 use std::ops::Index;
 
 pub struct Qubit {
-    state: [f64; 2],
+    pub(crate) state: [f64; 2],
 }
 
 impl Qubit {
@@ -42,7 +42,6 @@ impl Index<usize> for Qubit {
 
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::FRAC_1_SQRT_2;
     use super::*;
 
     #[test]
@@ -54,7 +53,7 @@ mod tests {
 
     #[test]
     fn test_measure() {
-        let mut q = Qubit::new();
+        let q = Qubit::new();
         let m = q.measure();
         assert!(m == 0 || m == 1);
     }

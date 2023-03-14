@@ -13,6 +13,20 @@ impl Logic {
         q.apply_matrix(&h);
     }
 
+    pub fn cnot(control: &mut Qubit, target: &mut Qubit) {
+        let cx = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0, 0.0],
+        ];
+        let mut q = control.tensor_product(target);
+        q.apply_matrix(&cx);
+        let (c, t) = q.split();
+        *control = c;
+        *target = t;
+    }
+
     pub fn pauli_x(q: &mut Qubit) {
         let x = [[0.0, 1.0], [1.0, 0.0]];
         q.apply_matrix(&x);
@@ -90,6 +104,21 @@ mod tests {
         Logic::phase_inverse(&mut q);
         assert!((q[0] - 1.0).abs() < 0.0001);
         assert!((q[1] - 0.0).abs() < 0.0001);
+    }
+
+    #[test]
+    fn test_split() {
+        let q = Qubit::new();
+        let (q0, q1) = Logic::split();
+        assert_eq!(q0.state, [1.0, 0.0]);
+        assert_eq!(q1.state, [0.0, 0.0]);
+
+        let q = Qubit {
+            state: [0.0, 1.0],
+        };
+        let (q0, q1) = Logic::split();
+        assert_eq!(q0.state, [0.0, 1.0]);
+        assert_eq!(q1.state, [0.0, 0.0]);
     }
 }
 

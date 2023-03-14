@@ -1,9 +1,10 @@
 use std::f64::consts::FRAC_1_SQRT_2;
-use crate::qbit::qbit::Qubit;
+use crate::qbit::qbit::{Qubit, Qubit8};
 
 #[derive(Debug)]
 pub struct Logic;
 
+#[allow(dead_code)]
 impl Logic {
     pub fn hadamard(q: &mut Qubit) {
         let h = [
@@ -26,6 +27,29 @@ impl Logic {
         *control = c;
         *target = t;
     }
+
+    /*
+
+    pub fn toffoli(control1: &mut Qubit, control2: &mut Qubit, target: &mut Qubit) {
+        let ccx = [
+            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+        ];
+        let mut q: Qubit8 = control1.tensor_product(control2).tensor_product(target);
+        q.apply_matrix(&ccx);
+        let (c1, c2, t) = q.split();
+        *control1 = c1;
+        *control2 = c2;
+        *target = t;
+    }
+
+     */
 
     pub fn pauli_x(q: &mut Qubit) {
         let x = [[0.0, 1.0], [1.0, 0.0]];
@@ -107,17 +131,13 @@ mod tests {
     }
 
     #[test]
-    fn test_split() {
-        let q = Qubit::new();
-        let (q0, q1) = Logic::split();
-        assert_eq!(q0.state, [1.0, 0.0]);
-        assert_eq!(q1.state, [0.0, 0.0]);
+    fn test_cnot() {
+        let mut q0 = Qubit::new();
+        let mut q1 = Qubit::new();
 
-        let q = Qubit {
-            state: [0.0, 1.0],
-        };
-        let (q0, q1) = Logic::split();
-        assert_eq!(q0.state, [0.0, 1.0]);
+        // CNOT should leave the qubits in the same state if control is |0>
+        Logic::cnot(&mut q0, &mut q1);
+        assert_eq!(q0.state, [1.0, 0.0]);
         assert_eq!(q1.state, [0.0, 0.0]);
     }
 }

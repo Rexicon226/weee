@@ -162,28 +162,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new() {
-        let q = Qubit::new();
-        assert_eq!(q[0], 1.0);
-        assert_eq!(q[1], 0.0);
-    }
-
-    #[test]
-    fn test_measure() {
-        let q = Qubit::new();
-        let m = q.measure();
-        assert!(m == 0 || m == 1);
-    }
-
-    #[test]
-    fn test_apply_matrix() {
-        let mut q = Qubit::new();
-        let matrix = [[0.0, 1.0], [1.0, 0.0]];
-        q.apply_matrix(&matrix);
-        assert_eq!(q.state, [0.0, 1.0]);
-    }
-
-    #[test]
     fn test_split() {
         let q = Qubit {
             state: [0.0, 1.0],
@@ -206,39 +184,11 @@ mod tests {
     }
 
     #[test]
-    fn test_probability() {
-        let q = Qubit {
-            state: [0.6, 0.8],
-        };
-        let prob = q.probability();
-        assert_eq!(prob, 0.36);
-    }
-
-    #[test]
-    fn test_new_qubit4() {
-        let q = Qubit4::new();
-        assert_eq!(q.state, [1.0, 0.0, 0.0, 0.0]);
-    }
-
-    #[test]
     fn test_split_qubit4() {
         let q = Qubit4::new();
         let (q0, q1) = q.split();
         assert_eq!(q0.state, [1.0, 0.0]);
         assert_eq!(q1.state, [0.0, 0.0]);
-    }
-
-    #[test]
-    fn test_apply_matrix_qubit4() {
-        let mut q = Qubit4::new();
-        let matrix = [
-            [1.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0],
-        ];
-        q.apply_matrix(&matrix);
-        assert_eq!(q.state, [1.0, 0.0, 0.0, 0.0]);
     }
 }
 

@@ -1,25 +1,25 @@
 #[derive(Debug)]
-pub struct Qubit<dim> {
+pub struct Qubit<const DIM: usize> {
     pub(crate) dim: usize,
-    pub(crate) state: [f64; Self.dim],
+    pub(crate) state: [f64; DIM],
 }
 
-impl<dim> Qubit<dim> {
+impl<const DIM: usize> Qubit<DIM> {
 
     pub fn new() -> Self {
-        let mut state = [0.0; dim];
+        let mut state = [0.0; DIM];
         state[0] = 1.0;
         Qubit {
-            dim,
+            dim: DIM,
             state
         }
     }
 
-    pub fn apply_matrix(&mut self, matrix: [[f64; Self.dim]; Self.dim]) {
-        let mut new_state = [0.0; self.dim];
-        for i in 0..self.dim {
+    pub fn apply_matrix(&mut self, matrix: [[f64; DIM]; DIM]) {
+        let mut new_state = [0.0; DIM];
+        for i in 0..DIM {
             let mut sum = 0.0;
-            for j in 0..self.dim {
+            for j in 0..DIM {
                 sum += self.state[j] * matrix[j][i];
             }
             new_state[i] = sum;

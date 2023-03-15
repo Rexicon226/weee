@@ -6,36 +6,13 @@ pub struct Logic;
 
 #[allow(dead_code)]
 impl Logic {
-    pub fn tensor_product<DIM>(q1: &Qubit<DIM>, q2: &Qubit<DIM>) -> Vec<f64> {
-
-        let output_dim = q1.dim * q2.dim;
-
-        let mut vec_state = vec![0.0; output_dim];
-        for i in 0..q1.dim {
-            for j in 0..q2.dim {
-                vec_state[i * q1.dim + j] = q1.state[i] * q2.state[j];
-            }
-        }
-
-        let mut state: [f64; q1.dim] = [0.0; output_dim];
-        for i in 0..output_dim {
-            state[i] = vec_state[i];
-        }
-
-        let q = Qubit {
-            dim: output_dim,
-            state,
-        };
-        println!("{:?}", q);
-        vec_state
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::logic::gates::Logic;
     use crate::qbit::qbit::Qubit;
-
+    /*
     #[test]
     fn test_tensor_product2() {
         let q1 =  Qubit::<2>::new();
@@ -48,6 +25,8 @@ mod tests {
         println!("{:?}", q4);
         assert_eq!(q4, [0.0, 1.0, 0.0, 0.0]);
     }
+
+     */
 }
 
 /*

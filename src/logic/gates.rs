@@ -1,88 +1,62 @@
-use std::f64::consts::FRAC_1_SQRT_2;
-use crate::qbit::qbit::{Qubit};
+//use std::f64::consts::FRAC_1_SQRT_2;
+use crate::qbit::qbit::Qubit;
 
 #[derive(Debug)]
 pub struct Logic;
 
 #[allow(dead_code)]
 impl Logic {
-    pub fn hadamard(q: &mut Qubit) {
-        let h = [
-            [FRAC_1_SQRT_2, FRAC_1_SQRT_2],
-            [FRAC_1_SQRT_2, -FRAC_1_SQRT_2],
-        ];
-        q.apply_matrix(&h);
-    }
+    pub fn tensor_product<DIM>(q1: &Qubit<DIM>, q2: &Qubit<DIM>) -> Vec<f64> {
 
-    pub fn cnot(control: &mut Qubit, target: &mut Qubit) {
-        let cx = [
-            [1.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0],
-            [0.0, 0.0, 1.0, 0.0],
-        ];
-        let mut q = control.tensor_product(target);
-        q.apply_matrix(&cx);
-        let (c, t) = q.split();
-        *control = c;
-        *target = t;
-    }
+        let output_dim = q1.dim * q2.dim;
 
-    /*
+        let mut vec_state = vec![0.0; output_dim];
+        for i in 0..q1.dim {
+            for j in 0..q2.dim {
+                vec_state[i * q1.dim + j] = q1.state[i] * q2.state[j];
+            }
+        }
 
-    pub fn toffoli(control1: &mut Qubit, control2: &mut Qubit, target: &mut Qubit) {
-        let ccx = [
-            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-        ];
-        let mut q: Qubit8 = control1.tensor_product(control2).tensor_product(target);
-        q.apply_matrix(&ccx);
-        let (c1, c2, t) = q.split();
-        *control1 = c1;
-        *control2 = c2;
-        *target = t;
-    }
+        let mut state: [f64; q1.dim] = [0.0; output_dim];
+        for i in 0..output_dim {
+            state[i] = vec_state[i];
+        }
 
-     */
-
-    pub fn pauli_x(q: &mut Qubit) {
-        let x = [[0.0, 1.0], [1.0, 0.0]];
-        q.apply_matrix(&x);
-    }
-
-    pub fn pauli_y(q: &mut Qubit) {
-        let y = [[0.0, -1.0], [1.0, 0.0]];
-        q.apply_matrix(&y);
-    }
-
-    pub fn pauli_z(q: &mut Qubit) {
-        let z = [[1.0, 0.0], [0.0, -1.0]];
-        q.apply_matrix(&z);
-    }
-
-    pub(crate) fn phase(q: &mut Qubit) {
-        let s = [[1.0, 0.0], [0.0, FRAC_1_SQRT_2]];
-        q.apply_matrix(&s);
-    }
-
-    pub fn phase_inverse(q: &mut Qubit) {
-        let s = [[1.0, 0.0], [0.0, -FRAC_1_SQRT_2]];
-        q.apply_matrix(&s);
+        let q = Qubit {
+            dim: output_dim,
+            state,
+        };
+        println!("{:?}", q);
+        vec_state
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::logic::gates::Logic;
+    use crate::qbit::qbit::Qubit;
 
     #[test]
+    fn test_tensor_product2() {
+        let q1 =  Qubit::<2>::new();
+        let q2 = Qubit::<2> {
+            dim: 2,
+            state: [0.0, 1.0],
+        };
+
+        let q4 = Logic::tensor_product(&q1, &q2);
+        println!("{:?}", q4);
+        assert_eq!(q4, [0.0, 1.0, 0.0, 0.0]);
+    }
+}
+
+/*
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
     fn test_hadamard() {
+        qubit_type!(2);
         let mut q = Qubit::new();
         Logic::hadamard(&mut q);
         assert_eq!(q[0], FRAC_1_SQRT_2);
@@ -140,5 +114,7 @@ mod tests {
         assert_eq!(q0.state, [1.0, 0.0]);
         assert_eq!(q1.state, [0.0, 0.0]);
     }
-}
 
+
+}
+ */

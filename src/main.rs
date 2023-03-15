@@ -1,30 +1,22 @@
 use crate::logic::gates::Logic;
 use crate::qbit::qbit::Qubit;
 
-pub mod qbit;
 pub mod logic;
+pub mod qbit;
 
-fn bell_state_example() {
-    let mut q1 = Qubit::new();
-    let mut q2 = Qubit::new();
+fn test_tensor_product2() {
+    let q1 = Qubit::<2>::new();
+    let q2 = Qubit::<2> {
+        dim: 2,
+        state: [0.0, 1.0],
+    };
 
-    Logic::hadamard(&mut q1);
-
-    Logic::cnot(&mut q1, &mut q2);
-
-    let m1 = q1.measure();
-    let m2 = q2.measure();
-
-    match (m1, m2) {
-        (0, 0) => println!("Bell state |Φ⁺> detected"),
-        (0, 1) => println!("Bell state |Ψ⁺> detected"),
-        (1, 0) => println!("Bell state |Ψ⁻> detected"),
-        (1, 1) => println!("Bell state |Φ⁻> detected"),
-        _ => unreachable!(),
-    }
+    let q4 = Logic::tensor_product(&q1, &q2);
+    println!("{:?}", q4);
 }
 
 fn main() {
-    print!("Bell state example: ");
-    bell_state_example();
+    test_tensor_product2();
+    return;
 }
+

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Qubit<const DIM: usize> {
     pub(crate) dim: usize,
     pub(crate) state: [f64; DIM],
@@ -27,8 +27,32 @@ impl<const DIM: usize> Qubit<DIM> {
         self.state = new_state;
     }
 
+    pub fn tensor_product(self, q2: &mut Qubit<DIM>) -> Qubit<{ DIM * 2 }> {
+        let mut new_state = [0.0; DIM * 2];
 
-    // split to Dim/2 qbit
+        for i in 0..2 {
+            for j in 0..2 {
+                new_state[i * 2 + j] = self.state[i] * q2.state[j];
+            }
+        }
+
+        Qubit {
+            dim: DIM * 2,
+            state: new_state
+        }
+    }
+
+    pub fn split(self) -> (Qubit<{ DIM / 2 }>, Qubit<{ DIM / 2 }>) {
+        let mut q1 = Qubit::<{ DIM / 2 }>::new();
+        let mut q2 = Qubit::<{ DIM / 2 }>::new();
+
+        for i in 0..DIM / 2 {
+            q1.state[i] = self.state[i];
+            q2.state[i] = self.state[i + DIM / 2];
+        }
+
+        (q1, q2)
+    }
 }
 
 impl Qubit<2> {
@@ -44,6 +68,7 @@ impl Qubit<2> {
             1
         }
     }
+
 }
 
 #[cfg(test)]
@@ -83,10 +108,13 @@ mod tests {
     #[test]
     fn test_apply_matrix2() {
         let mut q =  Qubit::<2>::new();
-        let matrix = [[0.0, 1.0], [1.0, 0.0]];
+        let matrix = [
+            [0.0, 1.0], [1.0, 0.0]
+        ];
         q.apply_matrix(matrix);
         assert_eq!(q.state, [0.0, 1.0]);
     }
+
     #[test]
     fn test_apply_matrix4() {
         let mut q =  Qubit::<4>::new();
@@ -98,5 +126,13 @@ mod tests {
         ];
         q.apply_matrix(matrix);
         assert_eq!(q.state, [1.0, 0.0, 0.0, 0.0]);
+    }
+
+    #[test]
+    fn test_split() {
+        let q = Qubit::<4>::new();
+        let (q0, q1) = q.split();
+        assert_eq!(q0.state, [1.0, 0.0]);
+        assert_eq!(q1.state, [0.0, 0.0]);
     }
 }
